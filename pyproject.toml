@@ -1,0 +1,31 @@
+[project]
+name = "llm-batch-orchestrator"
+version = "0.1.0"
+description = "Concurrent, resilient batch orchestration for simulated LLM providers."
+authors = [
+    {name = "Gabriel Gabriele",email = "113068334+gabridevs@users.noreply.github.com"}
+]
+requires-python = ">=3.13"
+readme = "README.md"
+dependencies = [
+    "pydantic (>=2.0,<3.0)"
+]
+
+[tool.poetry]
+packages = [{ include = "llm_orchestrator" }]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project.scripts]
+llm-batch-orchestrator = "llm_orchestrator.cli:main"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.16.8,<0.17.0)"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
