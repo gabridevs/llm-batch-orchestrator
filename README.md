@@ -5,6 +5,8 @@ providers. It is designed for I/O-bound provider calls: it preserves the link
 between every request and result, limits concurrency, retries transient
 failures, and returns partial successes when other requests fail.
 
+Run the interactive [Google Colab demo](https://colab.research.google.com/github/gabridevs/llm-batch-orchestrator/blob/main/notebooks/llm_batch_orchestrator_demo.ipynb).
+
 ## Features
 
 - Pydantic v2 models validate immutable requests, batches, results, metrics,
