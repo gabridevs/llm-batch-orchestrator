@@ -18,6 +18,8 @@ Run the interactive [Google Colab demo](https://colab.research.google.com/github
 - `asyncio.Semaphore` enforces the configured concurrent-call ceiling.
 - Exponential retry/backoff only for transient provider errors.
 - Structured per-request success/failure records; no completed work is lost.
+- JSON reports expose both `successful_results` and `failed_results`, while
+  retaining the original ordered `results` collection for input matching.
 - Metrics for elapsed time, success/failure counts, retries, and estimated
   token use.
 - Hierarchical logging with console and rotating-file handlers. Prompts and
@@ -63,6 +65,21 @@ BatchRequest (Pydantic validation)
 call in `asyncio.Semaphore(max_concurrency)`. Results are collected as tasks
 finish and written into their original indexes, so completion order never
 changes request/result correspondence.
+
+## Functional preparation and post-processing
+
+The small functions in `llm_orchestrator.functional` form the data pipeline:
+
+```text
+immutable LlmRequest values -> prepare_batch -> BatchRequest
+provider RequestResult values -> partition_results -> success/failure tuples
+text -> estimate_tokens -> metric value
+```
+
+They return new immutable values and do not mutate requests, results, or
+provider state. Keeping these transformations pure makes them easy to test and
+keeps side effects (network simulation, retries, logs) inside the orchestrator
+and provider boundaries.
 
 ## Why asyncio is the primary strategy
 

@@ -1,6 +1,14 @@
 """Pure preparation and post-processing functions."""
 
-from llm_orchestrator.models.requests import LlmRequest
+from collections.abc import Iterable
+
+from llm_orchestrator.models.requests import BatchRequest, LlmRequest
+from llm_orchestrator.models.results import RequestResult, RequestStatus
+
+
+def prepare_batch(requests: Iterable[LlmRequest]) -> BatchRequest:
+    """Build an immutable validated batch without mutating the input iterable."""
+    return BatchRequest(requests=tuple(requests))
 
 
 def estimate_tokens(text: str) -> int:
@@ -15,3 +23,16 @@ def request_summary(request: LlmRequest) -> dict[str, str]:
         "provider_name": request.provider_name,
         "operation": request.operation.value,
     }
+
+
+def partition_results(
+    results: tuple[RequestResult, ...],
+) -> tuple[tuple[RequestResult, ...], tuple[RequestResult, ...]]:
+    """Return immutable success and failure groups while preserving their order."""
+    successful_results = tuple(
+        result for result in results if result.status == RequestStatus.SUCCESS
+    )
+    failed_results = tuple(
+        result for result in results if result.status == RequestStatus.FAILURE
+    )
+    return successful_results, failed_results

@@ -57,6 +57,8 @@ class OrchestratorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.status, RequestStatus.SUCCESS)
         self.assertEqual(result.attempts, 2)
         self.assertEqual(report.metrics.total_retries, 1)
+        self.assertEqual(report.successful_results, (result,))
+        self.assertEqual(report.failed_results, ())
 
     async def test_does_not_retry_permanent_failure(self) -> None:
         """Permanent provider failures should be returned immediately."""
@@ -69,6 +71,8 @@ class OrchestratorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(execute.await_count, 1)
         self.assertEqual(result.status, RequestStatus.FAILURE)
         self.assertEqual(result.error_type, "InvalidRequestError")
+        self.assertEqual(report.successful_results, ())
+        self.assertEqual(report.failed_results, (result,))
 
     async def test_asyncio_respects_limit_and_restores_input_order(self) -> None:
         """Completion order may differ while result order stays deterministic."""

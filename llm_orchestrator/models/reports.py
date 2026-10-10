@@ -1,7 +1,8 @@
 """Batch report and execution metric models."""
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
+from llm_orchestrator.functional import partition_results
 from llm_orchestrator.models.results import RequestResult, RequestStatus
 
 
@@ -26,6 +27,20 @@ class BatchReport(BaseModel):
     strategy_name: str
     results: tuple[RequestResult, ...]
     metrics: ExecutionMetrics
+
+    @computed_field
+    @property
+    def successful_results(self) -> tuple[RequestResult, ...]:
+        """Expose completed successful requests as an immutable output group."""
+        successes, _ = partition_results(self.results)
+        return successes
+
+    @computed_field
+    @property
+    def failed_results(self) -> tuple[RequestResult, ...]:
+        """Expose failures and their causes as an immutable output group."""
+        _, failures = partition_results(self.results)
+        return failures
 
     @model_validator(mode="after")
     def validate_metrics_match_results(self) -> "BatchReport":

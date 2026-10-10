@@ -1,5 +1,6 @@
 """Deterministic demo batches shared by the CLI, notebook, and benchmarks."""
 
+from llm_orchestrator.functional import prepare_batch
 from llm_orchestrator.models.requests import BatchRequest, LlmRequest, RequestOperation
 
 
@@ -20,4 +21,4 @@ def build_demo_batch(size: int, provider_name: str) -> BatchRequest:
         )
         for index in range(size)
     )
-    return BatchRequest(requests=requests)
+    return prepare_batch(requests)
